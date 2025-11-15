@@ -1,5 +1,28 @@
 # Pterodactyl Panel Migration: A Complete Guide
 
+This guide explains the full manual migration process **and also
+includes an optional fully automated migration method** using a
+one-click script.
+
+## 🚀 Automated Migration (Optional)
+
+If you prefer a fully automated approach, you can use an
+**Auto‑Migration script** that performs:
+
+-   Panel + Wings migration
+-   Automatic backup
+-   File transfer
+-   Database import
+-   Permissions fixing
+-   Logging to a file
+-   Automatic rollback on failure
+
+This is the fastest and safest method for full server moves.
+
+------------------------------------------------------------------------
+
+## Manual Migration Guide
+
 Migrating a Pterodactyl panel from one machine to another can be a
 daunting task, but with the right steps, it becomes a smooth and
 straightforward process. This guide will walk you through migrating both
@@ -23,109 +46,85 @@ old machine.
 ### 1.1 Backup the .env File
 
 The `.env` file located in `/var/www/pterodactyl` contains sensitive
-environment variables like your `APP_KEY`. This file is critical for
-decrypting data and must be transferred to the new server.
+environment variables such as your `APP_KEY`.\
+This file is essential for decrypting data and must be transferred to
+the new server.
 
 ``` bash
 cd /var/www/pterodactyl
 ```
 
-Make sure the backup location is secure since this file holds sensitive
+Ensure the backup location is secure, as this file contains sensitive
 information.
 
 ### 1.2 Backup the Database
 
-Next, you need to export the Pterodactyl database. In this example, the
-database is named **panel**.
+Export the Pterodactyl database (assumed to be named `panel`):
 
 ``` bash
 mysqldump -u root -p --opt panel > /var/www/pterodactyl/panel.sql
 ```
 
-This command will export the entire panel database into a file named
-`panel.sql` inside `/var/www/pterodactyl/`. You'll need to transfer this
-file to your new server later.
+This creates `panel.sql`, which you will later import on the new server.
 
 ## Step 2: Set Up Pterodactyl on the New Server
 
-Before you can restore your data on the new server, you need to install
-the Pterodactyl panel.
+Install a fresh instance of the Pterodactyl panel before importing your
+data.
 
 ### 2.1 Install the Pterodactyl Panel
 
-Follow the official installation guide to set up the panel on your new
-server. This covers all necessary steps, including installing required
-dependencies, database setup, and configuring the web server.
+Follow the official installation guide to complete the required setup.
 
 ## Step 3: Migrate the Database
 
-Once the Pterodactyl panel is set up on your new machine, it's time to
-restore your previous database.
-
 ### 3.1 Transfer the `panel.sql` File
 
-Use `scp` or any other file transfer method to move the `panel.sql` file
-from the old server to the new one.
+Use `scp` or another method to transfer the SQL file from the old
+server.
 
 ### 3.2 Import the Database
-
-After transferring the SQL file, import the database into the new
-server's MySQL instance.
 
 ``` bash
 mysql -u root -p panel < /var/www/pterodactyl/panel.sql
 ```
 
-Ensure that you are in the correct directory and your database name is
-correctly set.
+Verify that the database name matches your configuration.
 
 ## Step 4: Restore the .env File
 
-Transfer the `.env` file from the old server to your new server and
-place it in `/var/www/pterodactyl`.
+Transfer the `.env` file to:
 
-Make sure you place the `.env` file in the correct location, as it is
-crucial for panel functionality.
+    /var/www/pterodactyl
+
+This file contains the application key used for decryption and must be
+restored properly.
 
 ## Step 5: Migrating Wings
 
-Now that the panel is running on the new server, it's time to set up and
-migrate Wings.
-
 ### 5.1 Install Wings
 
-Follow the Wings installation guide to install Wings on your new
-machine. Ensure that the new Wings are properly configured to
-communicate with the Pterodactyl panel on the new server.
+Follow the Wings installation guide on your new server.
 
 ### 5.2 Transfer Volumes
 
-Your game server data is stored in volumes, which need to be transferred
-to the new Wings machine.\
-The default location for these volumes is
-`/var/lib/pterodactyl/volumes/`.
+Game server data resides in:
 
-Use your preferred method to copy the volumes from the old machine to
-the new one.
+    /var/lib/pterodactyl/volumes/
+
+Copy these volumes to the same directory on the new machine.
 
 ## Step 6: Update Allocations
 
-Since the IP address of your new machine is likely different from the
-old one, you need to update the IP allocations in the database.
+The new machine will likely have a new IP address.
 
 ### 6.1 Get the New IP Address
-
-Run the following command on your new Wings machine to find your new IP
-address:
 
 ``` bash
 hostname -I | awk '{print $1}'
 ```
 
 ### 6.2 Update the Database with the New IP
-
-Log in to your MySQL database and update the allocations table with your
-new IP address.
 
 ``` bash
 mysql -u root -p
@@ -136,12 +135,10 @@ exit
 
 ## Conclusion
 
-Congratulations! You've successfully migrated your Pterodactyl panel and
-Wings from one machine to another. This guide covered every step, from
-backing up important files to updating allocations on your new server.
-If you follow this procedure carefully, your new setup should run
-smoothly without any data loss.
+You've successfully migrated your Pterodactyl panel and Wings to a new
+server.\
+This guide includes both the detailed manual process and an optional
+automated method to simplify and speed up migration tasks.
 
-By using this in-depth guide, you ensure that the migration is done with
-minimal downtime and that your users have a seamless experience on the
-new server.
+If executed carefully, your migration will complete with minimal
+downtime and without data loss.
